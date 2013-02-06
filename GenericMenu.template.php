@@ -17,9 +17,8 @@ function template_generic_menu_sidebar_above()
 
 	// This is the main table - we need it so we can keep the content to the right of it.
 	echo '
-	<div id="main_container">
-		<div id="left_admsection">
-			<span id="admin_menu"></span>';
+	<div id="container">
+		<div id="left_admsection"><span id="admin_menu"></span>';
 
 	// What one are we rendering?
 	$context['cur_menu_id'] = isset($context['cur_menu_id']) ? $context['cur_menu_id'] + 1 : 1;
@@ -35,21 +34,20 @@ function template_generic_menu_sidebar_above()
 				<div class="cat_bar">
 					<h4 class="catbg">';
 
-			if ($firstSection && !empty($menu_context['can_toggle_drop_down']))
-			{
-				echo '
-						<span class="ie6_header floatleft">', $section['title'],'
-						<a href="', $menu_context['toggle_url'], '"><img style="margin: 0 0 0 5px; vertical-align: middle;" src="', $context['menu_image_path'], '/change_menu', $context['right_to_left'] ? '' : '2', '.png" alt="!" /></a>
-						</span>';
-			}
-
-			else
-			{
-				echo '
-						', $section['title'];
-			}
-
+		if ($firstSection && !empty($menu_context['can_toggle_drop_down']))
+		{
 			echo '
+						<span class="ie6_header floatleft">
+							<a href="', $menu_context['toggle_url'], '">', $section['title'],'<img style="margin: 0 5px; vertical-align: middle;" src="', $context['menu_image_path'], '/change_menu', $context['right_to_left'] ? '' : '2', '.png" alt="!" /></a>
+						</span>';
+		}
+		else
+		{
+			echo '
+						', $section['title'];
+		}
+
+		echo '
 					</h4>
 				</div>
 				<ul class="smalltext left_admmenu">';
@@ -94,7 +92,6 @@ function template_generic_menu_sidebar_above()
 		<div id="main_admsection">';
 
 	// If there are any "tabs" setup, this is the place to shown them.
-	//!!! Clean this up!
 	if (!empty($context['tabs']) && empty($context['force_disable_tabs']))
 		template_generic_menu_tabs($menu_context);
 }
@@ -117,36 +114,31 @@ function template_generic_menu_dropdown_above()
 	// Which menu are we rendering?
 	$context['cur_menu_id'] = isset($context['cur_menu_id']) ? $context['cur_menu_id'] + 1 : 1;
 	$menu_context = &$context['menu_data_' . $context['cur_menu_id']];
-
+    echo '<div class="container">';
 	if (!empty($menu_context['can_toggle_drop_down']))
 		echo '
-		<div id="menu_toggle">
-			<a href="', $menu_context['toggle_url'], '"><img style="margin: 0 2px 0 2px;" src="', $context['menu_image_path'], '/change_menu', $context['right_to_left'] ? '2' : '', '.png" alt="*" /></a>
-		</div>';
+	<a href="', $menu_context['toggle_url'], '"><img id="menu_toggle" src="', $context['menu_image_path'], '/change_menu', $context['right_to_left'] ? '2' : '', '.png" alt="*" /></a>';
 
 	echo '
-	<div id="adm_container">
-		<ul class="admin_menu" id="dropdown_menu_', $context['cur_menu_id'], '">';
+
+	<ul class="nav nav-pills" id="dropdown_menu_', $context['cur_menu_id'], '">';
 
 	// Main areas first.
-	$s = 0;
 	foreach ($menu_context['sections'] as $section)
 	{
-		$s ++;
-		$is_last = $s == count($menu_context['sections']);
-
 		if ($section['id'] == $menu_context['current_section'])
 		{
 			echo '
-			<li class="', $s == 1 ? 'first ': '', 'chosen', $is_last ? ' last last_chosen' : '', '"><h4>', $section['title'] , '</h4>
-				<ul>';
+			<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="firstlevel">', $section['title'] , '</span></a>
+				<ul class="dropdown-menu">';
 		}
 		else
 			echo '
-			<li', $s == 1 ? ' class="first"': '', $is_last ? ' class="last"' : '', '><h4>', $section['title'] , '</h4>
-				<ul>';
+			<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="firstlevel">', $section['title'] , '</span></a>
+				<ul class="dropdown-menu">';
 
 		// For every area of this section show a link to that area (bold if it's currently selected.)
+		$additional_items = 0;
 		foreach ($section['areas'] as $i => $area)
 		{
 			// Not supposed to be printed?
@@ -154,22 +146,23 @@ function template_generic_menu_dropdown_above()
 				continue;
 
 			echo '
-					<li>';
+					<li', (++$additional_items > 6) ? ' class="additional_items"' : '' ,'>';
 
 			// Is this the current area, or just some area?
 			if ($i == $menu_context['current_area'])
 			{
 				echo '
-						<a class="chosen', !empty($area['subsections']) ? ' subsection' : '', '" href="', isset($area['url']) ? $area['url'] : $menu_context['base_url'] . ';area=' . $i, $menu_context['extra_parameters'], '">', $area['icon'] , $area['label'], '</a>';
+						<a class="chosen" href="', (isset($area['url']) ? $area['url'] : $menu_context['base_url'] . ';area=' . $i), $menu_context['extra_parameters'], '"><span>', $area['icon'], $area['label'], !empty($area['subsections']) ? '...' : '', '</span></a>';
 
 				if (empty($context['tabs']))
 					$context['tabs'] = isset($area['subsections']) ? $area['subsections'] : array();
 			}
 			else
 				echo '
-						<a href="', isset($area['url']) ? $area['url'] : $menu_context['base_url'] . ';area=' . $i, $menu_context['extra_parameters'], '"', !empty($area['subsections']) ? ' class="subsection"' : '', '>', $area['icon'], $area['label'] , '</a>';
+						<a href="', (isset($area['url']) ? $area['url'] : $menu_context['base_url'] . ';area=' . $i), $menu_context['extra_parameters'], '"><span>', $area['icon'], $area['label'], !empty($area['subsections']) ? '...' : '', '</span></a>';
 
 			// Is there any subsections?
+			$additional_items_sub = 0;
 			if (!empty($area['subsections']))
 			{
 				echo '
@@ -180,15 +173,11 @@ function template_generic_menu_dropdown_above()
 					if (!empty($sub['disabled']))
 						continue;
 
-					echo '
-							<li>';
-
 					$url = isset($sub['url']) ? $sub['url'] : (isset($area['url']) ? $area['url'] : $menu_context['base_url'] . ';area=' . $i) . ';sa=' . $sa;
 
 					echo '
-								<a ', !empty($sub['selected']) ? 'class="chosen" ' : '', 'href="', $url, $menu_context['extra_parameters'], '">', $sub['label'], '</a>';
-
-					echo '
+							<li', (++$additional_items_sub > 6) ? ' class="additional_items"' : '' ,'>
+								<a ', !empty($sub['selected']) ? 'class="active" ' : '', 'href="', $url, $menu_context['extra_parameters'], '"><span>', $sub['label'], '</span></a>
 							</li>';
 				}
 
@@ -205,12 +194,13 @@ function template_generic_menu_dropdown_above()
 	}
 
 	echo '
-		</ul></div>';
+	</ul>
+';
 
 	// This is the main table - we need it so we can keep the content to the right of it.
 	echo '
-		<div class="clear">';
-
+<div id="admin_content" >';
+        
 	// It's possible that some pages have their own tabs they wanna force...
 	if (!empty($context['tabs']))
 		template_generic_menu_tabs($menu_context);
@@ -222,7 +212,7 @@ function template_generic_menu_dropdown_below()
 	global $context, $settings, $options;
 
 	echo '
-		</div>';
+</div>';
 }
 
 // Some code for showing a tabbed view.
@@ -233,9 +223,9 @@ function template_generic_menu_tabs(&$menu_context)
 	// Handy shortcut.
 	$tab_context = &$menu_context['tab_data'];
 
-	// Right to left tabs should be in reverse order.
-	if ($context['right_to_left'])
-		$tab_context['tabs'] = array_reverse($tab_context['tabs'], true);
+	echo '
+	<div class="cat_bar">
+		<h3 class="catbg">';
 
 	// Exactly how many tabs do we have?
 	foreach ($context['tabs'] as $id => $tab)
@@ -272,38 +262,51 @@ function template_generic_menu_tabs(&$menu_context)
 
 	// Find the selected tab
 	foreach ($tab_context['tabs'] as $sa => $tab)
+	{
 		if (!empty($tab['is_selected']) || (isset($menu_context['current_subsection']) && $menu_context['current_subsection'] == $sa))
 		{
 			$selected_tab = $tab;
 			$tab_context['tabs'][$sa]['is_selected'] = true;
 		}
+	}
 
-	echo '
-			<div class="tborder">
-				<h3 class="titlebg" style="margin: 0">';
-
-	// Show a help item?
-	if (!empty($selected_tab['help']) || !empty($tab_context['help']))
+	// Show an icon and/or a help item?
+	if (!empty($selected_tab['icon']) || !empty($tab_context['icon']) || !empty($selected_tab['help']) || !empty($tab_context['help']))
+	{
 		echo '
-					<a href="', $scripturl, '?action=helpadmin;help=', !empty($selected_tab['help']) ? $selected_tab['help'] : $tab_context['help'], '" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" align="top" /></a> ';
+			<span class="ie6_header floatleft">';
+
+		if (!empty($selected_tab['icon']) || !empty($tab_context['icon']))
+			echo '<img src="', $settings['images_url'], '/icons/', !empty($selected_tab['icon']) ? $selected_tab['icon'] : $tab_context['icon'], '" alt="" class="icon" />';
+
+		if (!empty($selected_tab['help']) || !empty($tab_context['help']))
+			echo '<a href="', $scripturl, '?action=helpadmin;help=', !empty($selected_tab['help']) ? $selected_tab['help'] : $tab_context['help'], '" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" class="icon" /></a>';
+
+		echo $tab_context['title'], '
+			</span>';
+	}
+	else
+	{
+		echo '
+			', $tab_context['title'];
+	}
 
 	echo '
-					', $tab_context['title'], '
-				</h3>';
+		</h3>
+	</div>';
 
 	// Shall we use the tabs?
 	if (!empty($settings['use_tabs']))
 	{
 		echo '
-				<div class="windowbg padding">
-					', !empty($selected_tab['description']) ? $selected_tab['description'] : $tab_context['description'], '
-				</div>';
+	<p class="windowbg description">
+		', !empty($selected_tab['description']) ? $selected_tab['description'] : $tab_context['description'], '
+	</p>';
 
+		// The admin tabs.
 		echo '
-			</div>
-			<div class="generic_tab_strip">
-				<div class="buttonlist">
-					<ul class="reset clearfix">';
+	<div id="adm_submenus">
+		<ul class="dropmenu">';
 
 		// Print out all the items in this tab.
 		foreach ($tab_context['tabs'] as $sa => $tab)
@@ -314,34 +317,27 @@ function template_generic_menu_tabs(&$menu_context)
 			if (!empty($tab['is_selected']))
 			{
 				echo '
-						<li class="active', !empty($tab['is_last']) ? ' last' : '', '">
-							<a href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], isset($tab['add_params']) ? $tab['add_params'] : '', '">
-								<span>
-									<em>', $tab['label'], '</em>
-								</span>
-							</a>
-						</li>';
+			<li>
+				<a class="active firstlevel" href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], isset($tab['add_params']) ? $tab['add_params'] : '', '"><span class="firstlevel">', $tab['label'], '</span></a>
+			</li>';
 			}
 			else
 				echo '
-						<li', !empty($tab['is_last']) ? ' class="last"' : '', '>
-							<a href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], isset($tab['add_params']) ? $tab['add_params'] : '', '">
-								<span>', $tab['label'], '</span>
-							</a>
-						</li>';
+			<li>
+				<a class="firstlevel" href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], isset($tab['add_params']) ? $tab['add_params'] : '', '"><span class="firstlevel">', $tab['label'], '</span></a>
+			</li>';
 		}
 
 		// the end of tabs
 		echo '
-					</ul>
-				</div><br />
-			</div>';
+		</ul>
+	</div><br class="clear" />';
 	}
 	// ...if not use the old style
 	else
 	{
 		echo '
-				<div class="windowbg padding">';
+	<p class="tabs">';
 
 		// Print out all the items in this tab.
 		foreach ($tab_context['tabs'] as $sa => $tab)
@@ -352,23 +348,19 @@ function template_generic_menu_tabs(&$menu_context)
 			if (!empty($tab['is_selected']))
 			{
 				echo '
-					<img src="', $settings['images_url'], '/selected.gif" alt="*" /> <strong><a href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], '">', $tab['label'], '</a></strong>';
+		<img src="', $settings['images_url'], '/selected.gif" alt="*" /> <strong><a href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], '">', $tab['label'], '</a></strong>';
 			}
 			else
 				echo '
-					<a href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], '">', $tab['label'], '</a>';
+		<a href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], '">', $tab['label'], '</a>';
 
 			if (empty($tab['is_last']))
 				echo ' | ';
 		}
 
 		echo '
-				</div>
-				<div class="windowbg smalltext padding">
-					', isset($selected_tab['description']) ? $selected_tab['description'] : $tab_context['description'], '
-				</div>
-			</div>
-		</div>';
+	</p>
+	<p class="windowbg description">', isset($selected_tab['description']) ? $selected_tab['description'] : $tab_context['description'], '</p>';
 	}
 }
 
