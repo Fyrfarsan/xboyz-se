@@ -62,12 +62,12 @@ function template_main()
 						<img src="', $settings['images_url'], '/xbz/folder_green.png" alt="', $txt['new_posts'],
                     '" title="', $txt['new_posts'], '" border="0" />';
             else
-                echo '<img src="', $settings['images_url'], '/xbz/folder_grey.png" alt="', $txt['old_posts'],
+                echo '<img src="', $settings['images_url'], '/xbz/folder_green_unread.png" alt="', $txt['old_posts'],
                     '" title="', $txt['old_posts'], '" />';
 
 
             echo '</div>
-						<div class="rowContent"><a href = "', $board['href'], '"
+						<div class="rowContent"><a class="heading" href = "', $board['href'], '"
                 name = "b', $board['id'], '" > ', $board['name'], ' </a> ';
 
             echo '							

@@ -212,7 +212,7 @@
             <div id="navbar" class="navbar">
                 <div id="brand" class="pull-left">
                     <a href="#" class="pull-left"><img src="<?php echo $settings['theme_url'] ?>/assets/img/xbz/xbz_logo.png" alt="XBOYZ.SE"></a>
-                    <!--img class="pull-left brand" src="<?php echo $settings['theme_url'] ?>/assets/img/xbz_avatars.png" /--><?php echo $settings['theme_url'] ?>/assets/img/xbz_avatars.png" /-->
+     
                 </div>
                 <div class="navbar-transparent">
 

@@ -63,7 +63,7 @@ function template_main()
 		if (!empty($context['topics']))
 		{
 		  //header
-			echo '<div class="span1"></div>
+			echo '<div class="span1 visible-desktop"></div>
                   <div class="span5"><h6>', $txt['subject'],'/',$txt['started_by'],'</h6></div>
                   <div class="span3 visible-desktop"><h6>',$txt['replies'],'/', $txt['views'],'</h6></div>
                   <div class="span3 hidden-phone"><h6>',$txt['last_post'],'</h6></div>';
@@ -96,7 +96,7 @@ function template_main()
             //       </div>;
             //print_r($topic['first_post']);
             echo '
-                   <div class="span1">
+                   <div class="span1 visible-desktop">
                    <img src="', $topic['first_post']['icon_url'], '" alt="" />
                    </div>
                   <div class="span5"><a class="heading" href="', $topic['first_post']['href'],'">', $topic['first_post']['subject'],'</a></br>', $txt['started_by'], ' ', $topic['first_post']['member']['link'], '</div>
